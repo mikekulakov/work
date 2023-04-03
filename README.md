@@ -1,2 +1,2 @@
 # work
-экспериментируем и ищем новые грани
+we are experimenting and looking for new facets
