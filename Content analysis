@@ -1,0 +1,28 @@
+Код для контент-анализа новостей с эмоциональной окраской на языке R.
+В этом примере мы будем использовать библиотеку tidytext для анализа текстовых данных и библиотеку syuzhet для определения эмоциональной окраски.
+# Загрузка библиотек
+library(tidyverse)
+library(tidytext)
+library(syuzhet)
+
+# Загрузка данных из файла CSV
+news <- read_csv("news.csv")
+
+# Преобразование данных в формат tidy
+news_tidy <- news %>% 
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+# Определение эмоциональной окраски каждого слова
+news_tidy$emotion <- get_sentiments("afinn")$value[match(news_tidy$word, get_sentiments("afinn")$word)]
+
+# Группировка по категории новостей и расчет средней эмоциональной окраски
+news_emotions <- news_tidy %>%
+  group_by(category) %>%
+  summarize(avg_emotion = mean(emotion, na.rm = TRUE))
+
+# Визуализация результатов
+ggplot(news_emotions, aes(x = category, y = avg_emotion)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Средняя эмоциональная окраска новостей по категориям", 
+       x = "Категория новостей", y = "Средняя эмоциональная окраска")
